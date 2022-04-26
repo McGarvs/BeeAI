@@ -38,46 +38,43 @@ def moveup_and_rename(p, moveTwo=False):
         p.rename(parent_dir / newName)
     return
 
-if __name__ == "__main__":
+def reArange(imgs_path):
     # https://stackoverflow.com/questions/2186525/how-to-use-glob-to-find-files-recursively
-    cwd = os.getcwd()
-    imgs_path = os.path.join(cwd, "Sample Pollen Data", "**", "*")
-    imgs_list = []
     dirs_to_delete = []
+    imgs_list = []
     for file in glob.glob(imgs_path, recursive=True):
         p = Path(file).absolute()
+        # Testing
+        if file.endswith('.JPG'):
+            imgs_list.append(file)
         # Check if dir and is Date or Old
-        print(p.name)
         if os.path.isdir(file):
             if is_date(p.name) or p.name == "Old":
                 dirs_to_delete.append(file)
             continue
-        # Delete DS_STORE
-        if file.endswith('.DS_Store'):
-            os.remove(file)
-            print("Deleted:\t", file)
-            continue
         # Handles date/Old/*.JPG
         if p.parents[0].name == "Old" and is_date(p.parents[1].name):
-            if ".JPG" in file:
-                imgs_list.append(file)
+            if file.endswith('.JPG'):
                 moveup_and_rename(p, moveTwo=True)
                 continue
         # Handles /Old/*.JPG and /Date/*.JPG
         if p.parents[0].name == "Old" or is_date(p.parents[0].name):
             if file.endswith('.JPG'):
-                imgs_list.append(file)
                 moveup_and_rename(p)
                 # if "10X" in file:
                 #     print(file)
-
-
     print("Num Images:", len(imgs_list))
-    print()
-    for dir in dirs_to_delete:
-        print(dir)
+    # Ensure deeper dirs come first for deletion
+    dirs_to_delete.sort(key=len)
+    dirs_to_delete.reverse()
+    return dirs_to_delete
 
-    # scan = os.scandir(os.path.join(cwd, "Sample Pollen Data"))
-    # for file in scan:
-    #     print(file.name)
+if __name__ == "__main__":
+    cwd = os.getcwd()
+    imgs_path = os.path.join(cwd, "Sample Pollen Data", "**", "*")
+    dirs_to_delete = reArange(imgs_path)
+    for dir in dirs_to_delete:
+        print("Deleting:", dir)
+        os.rmdir(dir)
+
     
