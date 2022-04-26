@@ -152,3 +152,4 @@ cython_debug/
 #.idea/
 
 Sample Pollen Data/
+.zip
