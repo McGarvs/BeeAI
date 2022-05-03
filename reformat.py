@@ -69,12 +69,26 @@ def reArange(imgs_path):
     dirs_to_delete.reverse()
     return dirs_to_delete
 
+def removeDirs(dirList):
+    """ 
+        Calls os.rmdir on each dir in dirList.
+        
+        On Error, prints an error message, and continues.
+    """
+    for dir in dirList:
+        try:
+            os.rmdir(dir)
+        except:
+            print("Error Deleting:", dir)
+            continue
+    return
+
 if __name__ == "__main__":
     cwd = os.getcwd()
-    imgs_path = os.path.join(cwd, "Sample Pollen Data", "**", "*")
+    imgs_path = os.path.join(cwd, "Pollen Slides", "**", "*")
     dirs_to_delete = reArange(imgs_path)
-    for dir in dirs_to_delete:
-        print("Deleting:", dir)
-        os.rmdir(dir)
+    removeDirs(dirs_to_delete)
+
+
 
     

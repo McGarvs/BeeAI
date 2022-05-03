@@ -1,6 +1,8 @@
 # BeeAI
 In Bash:
 ```cd to Project Dir```
-```find . 'Sample Pollen Data' '.DS_Store' -type f```
-```find . 'Sample Pollen Data' '.DS_Store' -type f -delete```
+Verify all the files that you want to delete with:
+```find . -name ".DS_Store" ```
+Enter the same line with -delete to remove them. 
+```find . -name ".DS_Store" -delete```
 ```python GetPics.py```
