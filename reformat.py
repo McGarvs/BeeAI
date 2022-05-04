@@ -1,14 +1,7 @@
-import cv2
-import numpy as np
 import glob
 import os
 from pathlib import Path
 from dateutil.parser import parse
-
-# https://stackoverflow.com/questions/49511342/python-move-a-file-up-one-directory
-
-# from fastai.learner import load_learner
-
 
 def is_date(string, fuzzy=False):
     """
@@ -38,18 +31,21 @@ def moveup_and_rename(p, moveTwo=False):
         p.rename(parent_dir / newName)
     return
 
-def reArange(imgs_path):
+def reFormat(imgs_path, pollenTypes):
     # https://stackoverflow.com/questions/2186525/how-to-use-glob-to-find-files-recursively
     dirs_to_delete = []
     imgs_list = []
+    tenX_list = []
     for file in glob.glob(imgs_path, recursive=True):
         p = Path(file).absolute()
         # Testing
         if file.endswith('.JPG'):
             imgs_list.append(file)
-        # Check if dir and is Date or Old
+        if ' 10X' in file:
+            tenX_list.append(file)
+        # If the path is a dir and its name is not one of the pollen types, delete it later
         if os.path.isdir(file):
-            if is_date(p.name) or p.name == "Old":
+            if p.name not in pollenTypes:
                 dirs_to_delete.append(file)
             continue
         # Handles date/Old/*.JPG
@@ -61,13 +57,12 @@ def reArange(imgs_path):
         if p.parents[0].name == "Old" or is_date(p.parents[0].name):
             if file.endswith('.JPG'):
                 moveup_and_rename(p)
-                # if "10X" in file:
-                #     print(file)
     print("Num Images:", len(imgs_list))
-    # Ensure deeper dirs come first for deletion
+    print("Num 10x Res. Images:", len(tenX_list))
+    # Reverse-Sort to ensure deeper dirs get deleted first
     dirs_to_delete.sort(key=len)
     dirs_to_delete.reverse()
-    return dirs_to_delete
+    return dirs_to_delete, tenX_list
 
 def removeDirs(dirList):
     """ 
@@ -86,7 +81,17 @@ def removeDirs(dirList):
 if __name__ == "__main__":
     cwd = os.getcwd()
     imgs_path = os.path.join(cwd, "Pollen Slides", "**", "*")
-    dirs_to_delete = reArange(imgs_path)
+    pollenTypes = [
+                    'Acmispon glaber', 'Amsinckia intermedia', 'Calystegia macrostegia', 
+                    'Camissonia bistorta', 'Centaurea melitensis', 'Corethrogyne filaginifolia', 
+                    'Croton setigerus', 'Ericameria pinifolia', 'Eriogonum fasciculatum', 
+                    'Eriogonum gracile', 'Erodium Botrys', 'Erodium cicutarium', 
+                    'Heterotheca grandiflora', 'Hirschfeldia incana', 'Lepidospartum squamatum', 
+                    'Lessingia glandulifera', 'Marah Macrocarpa', 'Mirabilis laevis', 
+                    'Penstemon spectabilis', 'Phacelia distans', 'Ribes aureum', 
+                    'Salvia apiana', 'Solanum umbelliferum'
+                ]
+    dirs_to_delete, tenX_list = reFormat(imgs_path, pollenTypes)
     removeDirs(dirs_to_delete)
 
 
